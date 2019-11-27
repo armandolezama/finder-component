@@ -1,0 +1,56 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+
+<dom-module id="finder-component">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #testing {
+        width: 100px;
+        width: 200px;
+      }
+      .tooltip {
+        font-size: 20px;
+      }
+      
+    </style>
+
+    <div id="testing">
+      Teclado shidoringo
+    </div>
+    <paper-tooltip class="tooltip" for="testing" position="bottom" offset="0"> Texto pal teclado</paper-tooltip>
+    
+    <template is="dom-repeat" >
+
+    </template>
+  </template>
+
+  <script>
+    /**
+     * `finder-component`
+     * Componente principal para finder-component
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class FinderComponent extends Polymer.Element {
+      static get is() { return 'finder-component'; }
+      static get properties() {
+        return {
+          textPoints: {
+            type: Array,
+            value: []
+          }
+        };
+      }
+      setTextPoints(data){
+        this.textPoints = data;
+      }
+    }
+
+    window.customElements.define(FinderComponent.is, FinderComponent);
+  </script>
+</dom-module>
