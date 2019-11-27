@@ -2,7 +2,7 @@
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 
 <dom-module id="finder-component">
-  <template>
+    <template>
     <style>
       :host {
         display: block;
@@ -25,32 +25,101 @@
     <template is="dom-repeat" >
 
     </template>
-  </template>
+    </template>
 
-  <script>
-    /**
-     * `finder-component`
-     * Componente principal para finder-component
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
-    class FinderComponent extends Polymer.Element {
-      static get is() { return 'finder-component'; }
-      static get properties() {
-        return {
-          textPoints: {
-            type: Array,
-            value: []
-          }
-        };
-      }
-      setTextPoints(data){
-        this.textPoints = data;
-      }
-    }
+    <script>
+        /**
+         * `finder-component`
+         * Componente principal para finder-component
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+        class FinderComponent extends Polymer.Element {
+            static get is() {
+                return 'finder-component';
+            }
+            static get properties() {
+                return {
+                    __textPoints: {
+                        type: Array,
+                        value: []
+                    },
+                    __recordBank: {
+                        type: Array,
+                        value: []
+                    },
+                    __nodeRecord: {
+                        type: Object,
+                        value: {
+                            nodeReference: {},
+                            branches: [],
+                            coordinates: [],
+                            fullNodeScan: false
+                        }
+                    },
+                    __state: {
+                        type: Object,
+                        value: {
+                            componentFound: false,
+                            elementFound: false,
+                            goChildNode: false,
+                            goBrotherNode: false,
+                            goFatherNode: false
+                        },
+                        __componentName: {
+                            type: String,
+                            value: ''
+                        },
+                        __itemId: {
+                            type: String,
+                            value: ''
+                        }
+                    }
+                };
+            }
 
-    window.customElements.define(FinderComponent.is, FinderComponent);
-  </script>
+            __writeNodeRecord(nodeReference, positionInRecordBank, currentCoordinate) {
+                this.__nodeRecord.nodeReference = nodeReference;
+
+                for (const index in nodeReference.childElementCount) {
+                    this.__nodeRecord.branches = [...this.__nodeRecord.branches, parseInt(index)];
+                }
+
+                if (positionInRecordBank === 0) {
+                    this.__nodeRecord.coordinates = [0];
+                } else {
+                    this.__nodeRecord.coordinates = [...this.__recordBank[positionInRecordBank - 1].coordinates, currentCoordinate];
+                }
+            }
+            __saveNodeReference() {
+                this.__recordBank = [...this.__recordBank, this.__nodeRecord];
+                this.__nodeRecord.nodeReference = {};
+                this.__nodeRecord.branches = [];
+                this.__nodeRecord.coordinates = [];
+            }
+
+            __componentNameIsNodeName(nodeName, componentName) {
+                return nodeName === componentName;
+            }
+
+            __componentElementExist(itemID, nodeReference) {
+                if (nodeReference.shadowRoot) {
+                    nodeReference.shadowRoot.querySelector(itemID);
+                } else {
+                    nodeReference.querySelector(itemID);
+                }
+            }
+
+            setTextPoints(data) {
+                this.textPoints = data;
+            }
+            __finderInit() {
+
+            }
+        }
+
+        window.customElements.define(FinderComponent.is, FinderComponent);
+    </script>
 </dom-module>
