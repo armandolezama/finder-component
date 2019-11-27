@@ -7,24 +7,10 @@
       :host {
         display: block;
       }
-      #testing {
-        width: 100px;
-        width: 200px;
-      }
-      .tooltip {
-        font-size: 20px;
-      }
       
     </style>
 
-    <div id="testing">
-      Teclado shidoringo
-    </div>
-    <paper-tooltip class="tooltip" for="testing" position="bottom" offset="0"> Texto pal teclado</paper-tooltip>
-    
-    <template is="dom-repeat" >
-
-    </template>
+    <p></p>
     </template>
 
     <script>
@@ -44,7 +30,8 @@
                 return {
                     __textPoints: {
                         type: Array,
-                        value: []
+                        value: [],
+                        observer: '__finderInit'
                     },
                     __recordBank: {
                         type: Array,
@@ -54,6 +41,7 @@
                         type: Object,
                         value: {
                             nodeReference: {},
+                            branchInUse: 0,
                             branches: [],
                             coordinates: [],
                             fullNodeScan: false
@@ -72,7 +60,7 @@
                             type: String,
                             value: ''
                         },
-                        __itemId: {
+                        __elementSelector: {
                             type: String,
                             value: ''
                         }
@@ -80,11 +68,37 @@
                 };
             }
 
-            __writeNodeRecord(nodeReference, positionInRecordBank, currentCoordinate) {
+            __createChildrenNode() {
+                this.__recordBank = [...this.__recordBank, this.__nodeRecord];
+                this.__nodeRecord.nodeReference = {};
+                this.__nodeRecord.branches = [];
+                this.__nodeRecord.branchInUse = 0;
+                this.__nodeRecord.coordinates = [];
+            }
+
+            __exploreChildrenNode(node, father, componentName, coordinateOfChildren){
+              this.__state.componentFound = __componentNameIsNodeName(node, this.textPoints);
+              if(!this.__state.componentFound){
+                  this.__writeNodeRecord(node, recordBank.length -1, coordinateOfChildren);
+                  if(this.__nodeRecord.coordinates.length > o){
+                    //set recordBank and reiterate over new recordBank
+                    this.__createChildrenNode()
+                  } else {
+                    this.__nodeRecord.fullNodeScan = true;
+                    
+                  }
+                }
+            }
+
+            __destroyChildrenNode(){
+              this.recordBank = this.recordBank.slice(0, -1)
+            }
+
+            __writeNodeRecord(nodeReference, currentCoordinate) {
                 this.__nodeRecord.nodeReference = nodeReference;
 
-                for (const index in nodeReference.childElementCount) {
-                    this.__nodeRecord.branches = [...this.__nodeRecord.branches, parseInt(index)];
+                for (let i = 0; i < nodeReference.childElementCount; i++) {
+                    this.__nodeRecord.branches = [...this.__nodeRecord.branches, i];
                 }
 
                 if (positionInRecordBank === 0) {
@@ -93,29 +107,36 @@
                     this.__nodeRecord.coordinates = [...this.__recordBank[positionInRecordBank - 1].coordinates, currentCoordinate];
                 }
             }
-            __saveNodeReference() {
-                this.__recordBank = [...this.__recordBank, this.__nodeRecord];
-                this.__nodeRecord.nodeReference = {};
-                this.__nodeRecord.branches = [];
-                this.__nodeRecord.coordinates = [];
+
+            __componentNameIsNodeName(node, componentName) {
+                return node.tagName.toLowerCase() === componentName;
             }
 
-            __componentNameIsNodeName(nodeName, componentName) {
-                return nodeName === componentName;
-            }
-
-            __componentElementExist(itemID, nodeReference) {
+            __componentElementExist(elementSelector, nodeReference) {
+              let element = {};
                 if (nodeReference.shadowRoot) {
-                    nodeReference.shadowRoot.querySelector(itemID);
+                    element = nodeReference.shadowRoot.querySelector(elementSelector);
                 } else {
-                    nodeReference.querySelector(itemID);
+                    element = nodeReference.querySelector(elementSelector);
                 }
+                return element ? true : false
+            }
+
+            __useRecordBank(){
+              do{
+//user recordBank[recordBank.length - 1] (current node) and recordBank[recordBank.length - 2] (father node)
+                
+              //Choose by length of branches if node have childrens
+                
+              }while(this.__recordBank > 1)
             }
 
             setTextPoints(data) {
                 this.textPoints = data;
+                this.__finderInit()
             }
             __finderInit() {
+              
 
             }
         }
